@@ -737,3 +737,39 @@ td.revenue {
 .task-item:hover .task-actions {
   opacity: 1;
 }
+
+/* Preset Card Styles */
+.preset-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.preset-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Template Editor */
+.template-preview-container {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 16px;
+  overflow: auto;
+}
+
+/* Color picker styling */
+input[type="color"] {
+  -webkit-appearance: none;
+  appearance: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 2px;
+}

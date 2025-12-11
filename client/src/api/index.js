@@ -118,8 +118,11 @@ export const templates = {
     create: (data) => api.post('/templates', data),
     update: (id, data) => api.put(`/templates/${id}`, data),
     delete: (id) => api.delete(`/templates/${id}`),
-    getDefault: (type) => api.get(`/templates/default/${type}`)
+    getDefault: (type) => api.get(`/templates/default/${type}`),
+    getPresets: () => api.get('/templates/presets'),
+    createFromPreset: (data) => api.post('/templates/from-preset', data)
 };
+
 
 // Providers
 export const providers = {
