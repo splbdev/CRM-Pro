@@ -13,6 +13,10 @@ const estimateRoutes = require('./routes/estimates');
 const templateRoutes = require('./routes/templates');
 const proposalRoutes = require('./routes/proposals');
 const messageRoutes = require('./routes/messages');
+const analyticsRoutes = require('./routes/analytics');
+const paymentRoutes = require('./routes/payments');
+const taskRoutes = require('./routes/tasks');
+const tagRoutes = require('./routes/tags');
 
 // Cron jobs
 const { startCronJobs } = require('./cron/recurring');
@@ -43,6 +47,10 @@ app.use('/api/estimates', estimateRoutes);
 app.use('/api/templates', templateRoutes);
 app.use('/api/proposals', proposalRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/tasks', taskRoutes);
+app.use('/api/tags', tagRoutes);
 
 // Dashboard stats
 app.get('/api/dashboard', async (req, res) => {

@@ -2,6 +2,7 @@ const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const { authMiddleware } = require('../middleware/auth');
 const { v4: uuidv4 } = require('uuid');
+const PDFDocument = require('pdfkit');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -60,6 +61,110 @@ router.get('/:id', authMiddleware, async (req, res) => {
     } catch (error) {
         console.error('Get invoice error:', error);
         res.status(500).json({ error: 'Failed to get invoice' });
+    }
+});
+
+// Generate PDF for invoice
+router.get('/:id/pdf', authMiddleware, async (req, res) => {
+    try {
+        const invoice = await prisma.invoice.findUnique({
+            where: { id: req.params.id },
+            include: { client: true }
+        });
+
+        if (!invoice) {
+            return res.status(404).json({ error: 'Invoice not found' });
+        }
+
+        // Create PDF document
+        const doc = new PDFDocument({ margin: 50 });
+
+        // Set response headers
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=invoice-${invoice.number}.pdf`);
+
+        // Pipe to response
+        doc.pipe(res);
+
+        // Add company header
+        doc.fontSize(24).font('Helvetica-Bold').text('INVOICE', 50, 50);
+        doc.fontSize(10).font('Helvetica').text(`Invoice #: ${invoice.number}`, 400, 50, { align: 'right' });
+        doc.text(`Date: ${new Date(invoice.date).toLocaleDateString()}`, { align: 'right' });
+        doc.text(`Due: ${new Date(invoice.dueDate).toLocaleDateString()}`, { align: 'right' });
+
+        // Status badge
+        doc.moveDown(2);
+        doc.fontSize(12).font('Helvetica-Bold').text(`Status: ${invoice.status}`, 50);
+
+        // Bill To section
+        doc.moveDown(1.5);
+        doc.fontSize(12).font('Helvetica-Bold').text('Bill To:', 50);
+        doc.fontSize(10).font('Helvetica');
+        doc.text(invoice.client?.name || 'N/A');
+        if (invoice.client?.email) doc.text(invoice.client.email);
+        if (invoice.client?.address) doc.text(invoice.client.address);
+
+        // Items table
+        doc.moveDown(2);
+        const tableTop = doc.y;
+        const col1 = 50;
+        const col2 = 280;
+        const col3 = 350;
+        const col4 = 420;
+        const col5 = 490;
+
+        // Table header
+        doc.font('Helvetica-Bold').fontSize(10);
+        doc.text('Description', col1, tableTop);
+        doc.text('Qty', col2, tableTop);
+        doc.text('Price', col3, tableTop);
+        doc.text('Tax', col4, tableTop);
+        doc.text('Total', col5, tableTop);
+
+        // Header line
+        doc.moveTo(col1, tableTop + 15).lineTo(550, tableTop + 15).stroke();
+
+        // Items
+        doc.font('Helvetica');
+        let y = tableTop + 25;
+        const items = invoice.items || [];
+
+        items.forEach((item) => {
+            const itemTotal = (item.quantity || 1) * (item.price || 0);
+            const taxAmount = itemTotal * ((item.tax || 0) / 100);
+            const lineTotal = itemTotal + taxAmount;
+
+            doc.text(item.description || '', col1, y, { width: 220 });
+            doc.text(String(item.quantity || 1), col2, y);
+            doc.text(`$${(item.price || 0).toFixed(2)}`, col3, y);
+            doc.text(`${item.tax || 0}%`, col4, y);
+            doc.text(`$${lineTotal.toFixed(2)}`, col5, y);
+
+            y += 20;
+        });
+
+        // Total line
+        doc.moveTo(col1, y + 5).lineTo(550, y + 5).stroke();
+
+        // Total
+        y += 20;
+        doc.font('Helvetica-Bold').fontSize(12);
+        doc.text('Total:', col4, y);
+        doc.text(`$${invoice.total.toFixed(2)}`, col5, y);
+
+        // Footer
+        doc.fontSize(10).font('Helvetica').text(
+            'Thank you for your business!',
+            50,
+            doc.page.height - 100,
+            { align: 'center' }
+        );
+
+        // Finalize
+        doc.end();
+    } catch (error) {
+        console.error('PDF generation error:', error);
+        res.status(500).json({ error: 'Failed to generate PDF' });
     }
 });
 
@@ -183,3 +288,4 @@ function calculateNextRun(frequency) {
 }
 
 module.exports = router;
+

@@ -44,6 +44,35 @@ export const dashboard = {
     getStats: () => api.get('/dashboard')
 };
 
+// Analytics
+export const analytics = {
+    getRevenue: (period) => api.get('/analytics/revenue', { params: { period } }),
+    getClients: () => api.get('/analytics/clients'),
+    getInvoices: () => api.get('/analytics/invoices'),
+    getPipeline: () => api.get('/analytics/pipeline')
+};
+
+// Payments
+export const payments = {
+    createSession: (invoiceId) => api.post('/payments/create-session', { invoiceId }),
+    getLink: (invoiceId) => api.get(`/payments/link/${invoiceId}`),
+    getHistory: (invoiceId) => api.get(`/payments/invoice/${invoiceId}`),
+    recordManual: (data) => api.post('/payments/manual', data),
+    completeDemo: (data) => api.post('/payments/complete-demo', data),
+    getAll: (params) => api.get('/payments', { params })
+};
+
+// Tasks
+export const tasks = {
+    getAll: (params) => api.get('/tasks', { params }),
+    get: (id) => api.get(`/tasks/${id}`),
+    create: (data) => api.post('/tasks', data),
+    update: (id, data) => api.put(`/tasks/${id}`, data),
+    updateStatus: (id, status) => api.patch(`/tasks/${id}/status`, { status }),
+    delete: (id) => api.delete(`/tasks/${id}`),
+    getStats: () => api.get('/tasks/stats/summary')
+};
+
 // Clients
 export const clients = {
     getAll: (params) => api.get('/clients', { params }),

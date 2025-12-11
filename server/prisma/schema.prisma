@@ -15,6 +15,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   role      String   @default("USER") // ADMIN, USER
+  tasks     Task[]
 }
 
 model Client {
@@ -30,26 +31,30 @@ model Client {
   invoices  Invoice[]
   estimates Estimate[]
   messages  Message[]
+  tasks     Task[]
 }
 
 model Invoice {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   clientId    String
-  client      Client   @relation(fields: [clientId], references: [id])
-  number      String   @unique
+  client      Client    @relation(fields: [clientId], references: [id])
+  number      String    @unique
   date        DateTime
   dueDate     DateTime
-  status      String   @default("DRAFT") // DRAFT, SENT, PAID, OVERDUE, CANCELLED
-  items       Json     // Array of { description, quantity, price, tax }
+  status      String    @default("DRAFT") // DRAFT, SENT, PAID, OVERDUE, CANCELLED
+  items       Json      // Array of { description, quantity, price, tax }
   total       Float
-  currency    String   @default("USD")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  currency    String    @default("USD")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   
   // Recurring
-  isRecurring Boolean  @default(false)
-  frequency   String?  // WEEKLY, MONTHLY, ANNUAL
+  isRecurring Boolean   @default(false)
+  frequency   String?   // WEEKLY, MONTHLY, ANNUAL
   nextRun     DateTime?
+  
+  // Payments
+  payments    Payment[]
 }
 
 model Estimate {
@@ -112,3 +117,50 @@ model Message {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model Payment {
+  id              String   @id @default(uuid())
+  invoiceId       String
+  invoice         Invoice  @relation(fields: [invoiceId], references: [id])
+  amount          Float
+  stripePaymentId String?
+  stripeSessionId String?
+  status          String   @default("PENDING") // PENDING, COMPLETED, FAILED, REFUNDED
+  method          String   @default("STRIPE") // STRIPE, MANUAL, BANK_TRANSFER
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Task {
+  id          String    @id @default(uuid())
+  title       String
+  description String?
+  clientId    String?
+  client      Client?   @relation(fields: [clientId], references: [id])
+  assigneeId  String?
+  assignee    User?     @relation(fields: [assigneeId], references: [id])
+  dueDate     DateTime?
+  priority    String    @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+  status      String    @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Tag {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  color     String   @default("#6366f1")
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String
+  action    String   // CREATE, UPDATE, DELETE
+  entity    String   // Client, Invoice, etc.
+  entityId  String
+  details   Json?
+  createdAt DateTime @default(now())
+}
+

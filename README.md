@@ -56,6 +56,34 @@ A comprehensive, full-featured Client Relationship Management (CRM) platform bui
 - **Secure Authentication**: JWT-based authentication system
 - **User Profiles**: Manage user information and permissions
 
+### 📊 Analytics Dashboard (NEW)
+- **Revenue Analytics**: Track revenue trends by day, month, or year
+- **Client Insights**: Top clients by revenue, client growth metrics
+- **Invoice Metrics**: Collection rates, average payment time, overdue tracking
+- **Sales Pipeline**: Monitor estimates and proposals conversion rates
+
+### 💳 Payment Integration (NEW)
+- **Stripe Integration**: Accept online payments via Stripe checkout
+- **Manual Payments**: Record cash, check, or bank transfer payments
+- **Partial Payments**: Support for installment payments
+- **Payment History**: Track all payments per invoice
+
+### ✅ Task Management (NEW)
+- **Full Task CRUD**: Create, edit, delete, and complete tasks
+- **Priority Levels**: LOW, MEDIUM, HIGH, URGENT priorities
+- **Client Linking**: Associate tasks with specific clients
+- **Due Date Tracking**: Automatic overdue detection
+- **Filtering**: Filter by status, priority, or client
+
+### 📄 Document Features (NEW)
+- **PDF Export**: Generate professional invoice PDFs
+- **Tags System**: Organize clients and invoices with color-coded tags
+
+### 🤖 Automation (NEW)
+- **Overdue Detection**: Automatic invoice status updates
+- **Task Reminders**: Daily reminder for due tasks
+- **Audit Logging**: Track all system actions automatically
+
 ## 🛠️ Technology Stack
 
 ### Frontend
@@ -180,6 +208,10 @@ The application provides RESTful API endpoints for:
 - Template operations (`/api/templates`)
 - Message center (`/api/messages`)
 - Provider configuration (`/api/providers`)
+- Analytics & reports (`/api/analytics`) - NEW
+- Payment processing (`/api/payments`) - NEW
+- Task management (`/api/tasks`) - NEW
+- Tags organization (`/api/tags`) - NEW
 
 ## 📝 Database Schema
 
@@ -192,6 +224,10 @@ The application uses PostgreSQL with the following main entities:
 - **Templates** - Document templates
 - **Messages** - Communication history
 - **ProviderConfig** - Third-party service configurations
+- **Payments** - Payment records and Stripe integration (NEW)
+- **Tasks** - Task management with priorities (NEW)
+- **Tags** - Organizational tags (NEW)
+- **AuditLog** - System activity tracking (NEW)
 
 ## 🤝 Contributing
 

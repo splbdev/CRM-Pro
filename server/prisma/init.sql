@@ -133,3 +133,64 @@ CREATE TABLE IF NOT EXISTS "Message" (
     CONSTRAINT "Message_pkey" PRIMARY KEY ("id"),
     CONSTRAINT "Message_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Client"("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
+
+-- Payments table (NEW)
+CREATE TABLE IF NOT EXISTS "Payment" (
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
+    "invoiceId" TEXT NOT NULL,
+    "amount" DOUBLE PRECISION NOT NULL,
+    "stripePaymentId" TEXT,
+    "stripeSessionId" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "method" TEXT NOT NULL DEFAULT 'STRIPE',
+    "notes" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    
+    CONSTRAINT "Payment_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "Payment_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice"("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- Tasks table (NEW)
+CREATE TABLE IF NOT EXISTS "Task" (
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "clientId" TEXT,
+    "assigneeId" TEXT,
+    "dueDate" TIMESTAMP(3),
+    "priority" TEXT NOT NULL DEFAULT 'MEDIUM',
+    "status" TEXT NOT NULL DEFAULT 'PENDING',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    
+    CONSTRAINT "Task_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "Task_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Client"("id") ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT "Task_assigneeId_fkey" FOREIGN KEY ("assigneeId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE
+);
+
+-- Tags table (NEW)
+CREATE TABLE IF NOT EXISTS "Tag" (
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
+    "name" TEXT NOT NULL,
+    "color" TEXT NOT NULL DEFAULT '#6366f1',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT "Tag_pkey" PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "Tag_name_key" ON "Tag"("name");
+
+-- Audit Logs table (NEW)
+CREATE TABLE IF NOT EXISTS "AuditLog" (
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid(),
+    "userId" TEXT NOT NULL,
+    "action" TEXT NOT NULL,
+    "entity" TEXT NOT NULL,
+    "entityId" TEXT NOT NULL,
+    "details" JSONB,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT "AuditLog_pkey" PRIMARY KEY ("id")
+);
+CREATE INDEX IF NOT EXISTS "AuditLog_userId_idx" ON "AuditLog"("userId");
+CREATE INDEX IF NOT EXISTS "AuditLog_entity_entityId_idx" ON "AuditLog"("entity", "entityId");

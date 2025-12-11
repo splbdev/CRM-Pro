@@ -12,6 +12,8 @@ import Proposals from './pages/Proposals';
 import Templates from './pages/Templates';
 import Messages from './pages/Messages';
 import Settings from './pages/Settings';
+import Analytics from './pages/Analytics';
+import Tasks from './pages/Tasks';
 import './index.css';
 
 function ProtectedRoute({ children }) {
@@ -58,6 +60,8 @@ function AppRoutes() {
       <Route path="/templates" element={<ProtectedRoute><Templates /></ProtectedRoute>} />
       <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+      <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+      <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

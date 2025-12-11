@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
     FiHome, FiUsers, FiFileText, FiDollarSign, FiMail,
-    FiSettings, FiLogOut, FiLayers, FiBook
+    FiSettings, FiLogOut, FiLayers, FiBook, FiBarChart2, FiCheckSquare
 } from 'react-icons/fi';
 import './Layout.css';
 
@@ -17,6 +17,8 @@ export default function Layout({ children }) {
 
     const navItems = [
         { to: '/', icon: FiHome, label: 'Dashboard' },
+        { to: '/analytics', icon: FiBarChart2, label: 'Analytics' },
+        { to: '/tasks', icon: FiCheckSquare, label: 'Tasks' },
         { to: '/clients', icon: FiUsers, label: 'Clients' },
         { to: '/invoices', icon: FiDollarSign, label: 'Invoices' },
         { to: '/estimates', icon: FiFileText, label: 'Estimates' },
