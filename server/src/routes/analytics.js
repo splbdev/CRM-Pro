@@ -1,12 +1,12 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
-const auth = require('../middleware/auth');
+const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // Get revenue analytics
-router.get('/revenue', auth, async (req, res) => {
+router.get('/revenue', authMiddleware, async (req, res) => {
     try {
         const { period = 'monthly' } = req.query;
 
@@ -68,7 +68,7 @@ router.get('/revenue', auth, async (req, res) => {
 });
 
 // Get client analytics
-router.get('/clients', auth, async (req, res) => {
+router.get('/clients', authMiddleware, async (req, res) => {
     try {
         // Get clients with their invoice totals
         const clients = await prisma.client.findMany({
@@ -121,7 +121,7 @@ router.get('/clients', auth, async (req, res) => {
 });
 
 // Get invoice analytics
-router.get('/invoices', auth, async (req, res) => {
+router.get('/invoices', authMiddleware, async (req, res) => {
     try {
         const invoices = await prisma.invoice.findMany({
             orderBy: { createdAt: 'desc' }
@@ -190,7 +190,7 @@ router.get('/invoices', auth, async (req, res) => {
 });
 
 // Get sales pipeline (estimates + proposals)
-router.get('/pipeline', auth, async (req, res) => {
+router.get('/pipeline', authMiddleware, async (req, res) => {
     try {
         const estimates = await prisma.estimate.findMany();
         const proposals = await prisma.proposal.findMany();

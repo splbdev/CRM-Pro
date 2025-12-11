@@ -1,12 +1,12 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
-const auth = require('../middleware/auth');
+const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // Get all tasks
-router.get('/', auth, async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     try {
         const {
             status,
@@ -65,7 +65,7 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Get single task
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', authMiddleware, async (req, res) => {
     try {
         const task = await prisma.task.findUnique({
             where: { id: req.params.id },
@@ -87,7 +87,7 @@ router.get('/:id', auth, async (req, res) => {
 });
 
 // Create task
-router.post('/', auth, async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     try {
         const { title, description, clientId, assigneeId, dueDate, priority, status } = req.body;
 
@@ -119,7 +119,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // Update task
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
     try {
         const { title, description, clientId, assigneeId, dueDate, priority, status } = req.body;
 
@@ -148,7 +148,7 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 // Quick status update
-router.patch('/:id/status', auth, async (req, res) => {
+router.patch('/:id/status', authMiddleware, async (req, res) => {
     try {
         const { status } = req.body;
 
@@ -169,7 +169,7 @@ router.patch('/:id/status', auth, async (req, res) => {
 });
 
 // Delete task
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
     try {
         await prisma.task.delete({
             where: { id: req.params.id }
@@ -183,7 +183,7 @@ router.delete('/:id', auth, async (req, res) => {
 });
 
 // Get task stats
-router.get('/stats/summary', auth, async (req, res) => {
+router.get('/stats/summary', authMiddleware, async (req, res) => {
     try {
         const [pending, inProgress, completed, overdue] = await Promise.all([
             prisma.task.count({ where: { status: 'PENDING' } }),

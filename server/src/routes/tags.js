@@ -1,12 +1,12 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
-const auth = require('../middleware/auth');
+const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // Get all tags
-router.get('/', auth, async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     try {
         const tags = await prisma.tag.findMany({
             orderBy: { name: 'asc' }
@@ -19,7 +19,7 @@ router.get('/', auth, async (req, res) => {
 });
 
 // Create tag
-router.post('/', auth, async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     try {
         const { name, color } = req.body;
 
@@ -45,7 +45,7 @@ router.post('/', auth, async (req, res) => {
 });
 
 // Update tag
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
     try {
         const { name, color } = req.body;
 
@@ -62,7 +62,7 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 // Delete tag
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
     try {
         await prisma.tag.delete({
             where: { id: req.params.id }

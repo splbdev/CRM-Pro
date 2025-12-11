@@ -1,6 +1,6 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
-const auth = require('../middleware/auth');
+const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -140,7 +140,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
 });
 
 // Get payment history for an invoice
-router.get('/invoice/:invoiceId', auth, async (req, res) => {
+router.get('/invoice/:invoiceId', authMiddleware, async (req, res) => {
     try {
         const { invoiceId } = req.params;
 
@@ -174,7 +174,7 @@ router.get('/invoice/:invoiceId', auth, async (req, res) => {
 });
 
 // Record manual payment
-router.post('/manual', auth, async (req, res) => {
+router.post('/manual', authMiddleware, async (req, res) => {
     try {
         const { invoiceId, amount, method, notes } = req.body;
 
@@ -293,7 +293,7 @@ router.post('/complete-demo', async (req, res) => {
 });
 
 // Get all payments (admin)
-router.get('/', auth, async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     try {
         const { status, method, limit = 50 } = req.query;
 
