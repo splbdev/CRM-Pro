@@ -8,30 +8,32 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  role      String   @default("USER") // ADMIN, USER
-  tasks     Task[]
+  id          String      @id @default(uuid())
+  email       String      @unique
+  password    String
+  name        String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  role        String      @default("USER") // ADMIN, USER
+  tasks       Task[]
+  timeEntries TimeEntry[]
 }
 
 model Client {
-  id        String    @id @default(uuid())
-  name      String
-  email     String?
-  phone     String?
-  address   String?
-  notes     String?
-  company   String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  invoices  Invoice[]
-  estimates Estimate[]
-  messages  Message[]
-  tasks     Task[]
+  id          String      @id @default(uuid())
+  name        String
+  email       String?
+  phone       String?
+  address     String?
+  notes       String?
+  company     String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  invoices    Invoice[]
+  estimates   Estimate[]
+  messages    Message[]
+  tasks       Task[]
+  timeEntries TimeEntry[]
 }
 
 model Invoice {
@@ -137,18 +139,19 @@ model Payment {
 }
 
 model Task {
-  id          String    @id @default(uuid())
+  id          String      @id @default(uuid())
   title       String
   description String?
   clientId    String?
-  client      Client?   @relation(fields: [clientId], references: [id])
+  client      Client?     @relation(fields: [clientId], references: [id])
   assigneeId  String?
-  assignee    User?     @relation(fields: [assigneeId], references: [id])
+  assignee    User?       @relation(fields: [assigneeId], references: [id])
   dueDate     DateTime?
-  priority    String    @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
-  status      String    @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  priority    String      @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+  status      String      @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  timeEntries TimeEntry[]
 }
 
 model Tag {
@@ -224,4 +227,47 @@ model ReminderLog {
   recipient  String
   status     String   // SENT, FAILED
   sentAt     DateTime @default(now())
+}
+
+model TimeEntry {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  clientId    String?
+  client      Client?   @relation(fields: [clientId], references: [id])
+  taskId      String?
+  task        Task?     @relation(fields: [taskId], references: [id])
+  description String
+  startTime   DateTime
+  endTime     DateTime?
+  duration    Int?      // minutes
+  hourlyRate  Float?
+  billable    Boolean   @default(true)
+  invoiced    Boolean   @default(false)
+  invoiceId   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique // ADMIN, MANAGER, STAFF, ACCOUNTANT, CUSTOM
+  description String?
+  permissions Json     // Array of permission strings
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Signature {
+  id            String    @id @default(uuid())
+  entityType    String    // PROPOSAL, ESTIMATE, CONTRACT
+  entityId      String
+  signerName    String
+  signerEmail   String
+  signedAt      DateTime?
+  status        String    @default("PENDING") // PENDING, SIGNED, DECLINED
+  ipAddress     String?
+  signatureData String?   // Base64 signature image
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }

@@ -21,6 +21,8 @@ const attachmentRoutes = require('./routes/attachments');
 const expenseRoutes = require('./routes/expenses');
 const expenseCategoryRoutes = require('./routes/expense-categories');
 const reminderRoutes = require('./routes/reminders');
+const timeEntryRoutes = require('./routes/time-entries');
+const reportRoutes = require('./routes/reports');
 
 // Cron jobs
 const { startCronJobs } = require('./cron/recurring');
@@ -59,6 +61,8 @@ app.use('/api/attachments', attachmentRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/expense-categories', expenseCategoryRoutes);
 app.use('/api/reminders', reminderRoutes);
+app.use('/api/time-entries', timeEntryRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Dashboard stats
 app.get('/api/dashboard', async (req, res) => {
