@@ -168,3 +168,60 @@ model AuditLog {
   createdAt DateTime @default(now())
 }
 
+model Attachment {
+  id           String   @id @default(uuid())
+  filename     String
+  originalName String
+  mimeType     String
+  size         Int      // bytes
+  path         String   // storage path
+  entityType   String   // CLIENT, INVOICE, ESTIMATE, PROPOSAL, EXPENSE
+  entityId     String
+  uploadedBy   String?
+  createdAt    DateTime @default(now())
+}
+
+model Expense {
+  id          String   @id @default(uuid())
+  description String
+  amount      Float
+  date        DateTime
+  category    String
+  vendor      String?
+  notes       String?
+  receiptUrl  String?  // Link to attachment
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ExpenseCategory {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  color     String   @default("#6366f1")
+  createdAt DateTime @default(now())
+}
+
+model ReminderConfig {
+  id         String   @id @default(uuid())
+  type       String   // INVOICE_OVERDUE, INVOICE_DUE_SOON, ESTIMATE_FOLLOWUP
+  enabled    Boolean  @default(true)
+  daysBefore Int?     // For due soon reminders
+  daysAfter  Int?     // For overdue reminders
+  templateId String?  // Email template
+  channels   Json     // ["EMAIL", "SMS"]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model ReminderLog {
+  id         String   @id @default(uuid())
+  entityType String   // INVOICE, ESTIMATE
+  entityId   String
+  type       String
+  channel    String   // EMAIL, SMS
+  recipient  String
+  status     String   // SENT, FAILED
+  sentAt     DateTime @default(now())
+}

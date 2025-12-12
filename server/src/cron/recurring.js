@@ -1,5 +1,6 @@
 const cron = require('node-cron');
 const { PrismaClient } = require('@prisma/client');
+const reminderService = require('../services/reminder');
 
 const prisma = new PrismaClient();
 
@@ -167,8 +168,12 @@ function startCronJobs() {
     // Run every day at 1:00 AM - recurring invoices
     cron.schedule('0 1 * * *', processRecurringInvoices);
 
-    // Run every day at 9:00 AM - overdue invoice check
-    cron.schedule('0 9 * * *', processOverdueInvoices);
+    // Run every day at 9:00 AM - overdue invoice check and reminders
+    cron.schedule('0 9 * * *', async () => {
+        await processOverdueInvoices();
+        await reminderService.checkOverdueInvoices();
+        await reminderService.checkDueSoonInvoices();
+    });
 
     // Run every day at 8:00 AM - task reminders
     cron.schedule('0 8 * * *', processTaskReminders);

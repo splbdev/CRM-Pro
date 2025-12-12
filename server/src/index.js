@@ -17,6 +17,10 @@ const analyticsRoutes = require('./routes/analytics');
 const paymentRoutes = require('./routes/payments');
 const taskRoutes = require('./routes/tasks');
 const tagRoutes = require('./routes/tags');
+const attachmentRoutes = require('./routes/attachments');
+const expenseRoutes = require('./routes/expenses');
+const expenseCategoryRoutes = require('./routes/expense-categories');
+const reminderRoutes = require('./routes/reminders');
 
 // Cron jobs
 const { startCronJobs } = require('./cron/recurring');
@@ -51,6 +55,10 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/tags', tagRoutes);
+app.use('/api/attachments', attachmentRoutes);
+app.use('/api/expenses', expenseRoutes);
+app.use('/api/expense-categories', expenseCategoryRoutes);
+app.use('/api/reminders', reminderRoutes);
 
 // Dashboard stats
 app.get('/api/dashboard', async (req, res) => {

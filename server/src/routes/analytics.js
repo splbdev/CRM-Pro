@@ -244,4 +244,51 @@ router.get('/pipeline', authMiddleware, async (req, res) => {
     }
 });
 
+// Profit & Loss Report
+router.get('/profit-loss', authMiddleware, async (req, res) => {
+    try {
+        const { startDate, endDate } = req.query;
+
+        const where = {};
+        if (startDate || endDate) {
+            where.date = {};
+            if (startDate) where.date.gte = new Date(startDate);
+            if (endDate) where.date.lte = new Date(endDate);
+        }
+
+        // Get revenue from paid invoices
+        const invoiceWhere = { status: 'PAID' };
+        if (startDate || endDate) {
+            invoiceWhere.date = {};
+            if (startDate) invoiceWhere.date.gte = new Date(startDate);
+            if (endDate) invoiceWhere.date.lte = new Date(endDate);
+        }
+
+        const [revenue, expenses] = await Promise.all([
+            prisma.invoice.aggregate({
+                where: invoiceWhere,
+                _sum: { total: true }
+            }),
+            prisma.expense.aggregate({
+                where,
+                _sum: { amount: true }
+            })
+        ]);
+
+        const totalRevenue = revenue._sum.total || 0;
+        const totalExpenses = expenses._sum.amount || 0;
+        const profit = totalRevenue - totalExpenses;
+
+        res.json({
+            revenue: totalRevenue,
+            expenses: totalExpenses,
+            profit,
+            profitMargin: totalRevenue > 0 ? ((profit / totalRevenue) * 100).toFixed(2) : 0
+        });
+    } catch (error) {
+        console.error('Profit/Loss error:', error);
+        res.status(500).json({ error: 'Failed to calculate profit/loss' });
+    }
+});
+
 module.exports = router;

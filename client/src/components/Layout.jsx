@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
     FiHome, FiUsers, FiFileText, FiDollarSign, FiMail,
-    FiSettings, FiLogOut, FiLayers, FiBook, FiBarChart2, FiCheckSquare
+    FiSettings, FiLogOut, FiLayers, FiBook, FiBarChart2, FiCheckSquare, FiCreditCard
 } from 'react-icons/fi';
 import './Layout.css';
 
@@ -22,6 +22,7 @@ export default function Layout({ children }) {
         { to: '/clients', icon: FiUsers, label: 'Clients' },
         { to: '/invoices', icon: FiDollarSign, label: 'Invoices' },
         { to: '/estimates', icon: FiFileText, label: 'Estimates' },
+        { to: '/expenses', icon: FiCreditCard, label: 'Expenses' },
         { to: '/proposals', icon: FiBook, label: 'Proposals' },
         { to: '/templates', icon: FiLayers, label: 'Templates' },
         { to: '/messages', icon: FiMail, label: 'Messages' },

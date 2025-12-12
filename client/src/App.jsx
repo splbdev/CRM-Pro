@@ -14,6 +14,7 @@ import Messages from './pages/Messages';
 import Settings from './pages/Settings';
 import Analytics from './pages/Analytics';
 import Tasks from './pages/Tasks';
+import Expenses from './pages/Expenses';
 import './index.css';
 
 function ProtectedRoute({ children }) {
@@ -62,6 +63,7 @@ function AppRoutes() {
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
       <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
+      <Route path="/expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
