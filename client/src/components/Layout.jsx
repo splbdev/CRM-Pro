@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
     FiHome, FiUsers, FiFileText, FiDollarSign, FiMail,
-    FiSettings, FiLogOut, FiLayers, FiBook, FiBarChart2, FiCheckSquare, FiCreditCard
+    FiSettings, FiLogOut, FiLayers, FiBook, FiBarChart2, FiCheckSquare, FiCreditCard, FiClock, FiTrendingUp, FiTarget, FiBriefcase
 } from 'react-icons/fi';
 import './Layout.css';
 
@@ -23,6 +23,10 @@ export default function Layout({ children }) {
         { to: '/invoices', icon: FiDollarSign, label: 'Invoices' },
         { to: '/estimates', icon: FiFileText, label: 'Estimates' },
         { to: '/expenses', icon: FiCreditCard, label: 'Expenses' },
+        { to: '/time-tracking', icon: FiClock, label: 'Time Tracking' },
+        { to: '/reports', icon: FiTrendingUp, label: 'Reports' },
+        { to: '/leads', icon: FiTarget, label: 'Leads' },
+        { to: '/projects', icon: FiBriefcase, label: 'Projects' },
         { to: '/proposals', icon: FiBook, label: 'Proposals' },
         { to: '/templates', icon: FiLayers, label: 'Templates' },
         { to: '/messages', icon: FiMail, label: 'Messages' },

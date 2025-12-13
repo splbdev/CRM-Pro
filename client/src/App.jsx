@@ -15,6 +15,10 @@ import Settings from './pages/Settings';
 import Analytics from './pages/Analytics';
 import Tasks from './pages/Tasks';
 import Expenses from './pages/Expenses';
+import TimeTracking from './pages/TimeTracking';
+import Reports from './pages/Reports';
+import Leads from './pages/Leads';
+import Projects from './pages/Projects';
 import './index.css';
 
 function ProtectedRoute({ children }) {
@@ -64,6 +68,10 @@ function AppRoutes() {
       <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
       <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
       <Route path="/expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
+      <Route path="/time-tracking" element={<ProtectedRoute><TimeTracking /></ProtectedRoute>} />
+      <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+      <Route path="/leads" element={<ProtectedRoute><Leads /></ProtectedRoute>} />
+      <Route path="/projects" element={<ProtectedRoute><Projects /></ProtectedRoute>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
