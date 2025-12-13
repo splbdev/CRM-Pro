@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { clients } from '../api';
 import { FiPlus, FiSearch, FiEdit2, FiTrash2, FiMail, FiPhone } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import FileUpload from '../components/FileUpload';
 
 export default function Clients() {
     const [clientList, setClientList] = useState([]);
@@ -163,6 +164,28 @@ function ClientModal({ client, onClose, onSubmit }) {
         address: client?.address || '',
         notes: client?.notes || ''
     });
+    const [activeTab, setActiveTab] = useState('details');
+    const [attachments, setAttachments] = useState([]);
+
+    useEffect(() => {
+        if (client?.id) {
+            loadAttachments();
+        }
+    }, [client]);
+
+    const loadAttachments = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(
+                `${import.meta.env.VITE_API_URL}/api/attachments/entity/CLIENT/${client.id}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            const data = await response.json();
+            setAttachments(data);
+        } catch (error) {
+            console.error('Load attachments error:', error);
+        }
+    };
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -173,45 +196,154 @@ function ClientModal({ client, onClose, onSubmit }) {
         onSubmit(form);
     };
 
+    const handleUploadComplete = () => {
+        loadAttachments();
+        toast.success('File uploaded successfully');
+    };
+
+    const handleDeleteAttachment = async (id) => {
+        if (!confirm('Delete this file?')) return;
+        try {
+            const token = localStorage.getItem('token');
+            await fetch(`${import.meta.env.VITE_API_URL}/api/attachments/${id}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            toast.success('File deleted');
+            loadAttachments();
+        } catch (error) {
+            toast.error('Failed to delete file');
+        }
+    };
+
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '700px' }}>
                 <div className="modal-header">
                     <h3 className="modal-title">{client ? 'Edit Client' : 'Add Client'}</h3>
                     <button className="btn btn-sm btn-secondary" onClick={onClose}>×</button>
                 </div>
+
+                {/* Tabs */}
+                {client && (
+                    <div style={{ borderBottom: '1px solid #e5e7eb', padding: '0 1.5rem' }}>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <button
+                                onClick={() => setActiveTab('details')}
+                                style={{
+                                    padding: '0.75rem 1rem',
+                                    backgroundColor: 'transparent',
+                                    border: 'none',
+                                    borderBottom: activeTab === 'details' ? '2px solid #6366f1' : '2px solid transparent',
+                                    color: activeTab === 'details' ? '#6366f1' : '#666',
+                                    fontWeight: activeTab === 'details' ? '600' : '400',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Details
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('files')}
+                                style={{
+                                    padding: '0.75rem 1rem',
+                                    backgroundColor: 'transparent',
+                                    border: 'none',
+                                    borderBottom: activeTab === 'files' ? '2px solid #6366f1' : '2px solid transparent',
+                                    color: activeTab === 'files' ? '#6366f1' : '#666',
+                                    fontWeight: activeTab === 'files' ? '600' : '400',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Files ({attachments.length})
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit}>
                     <div className="modal-body">
-                        <div className="form-group">
-                            <label className="form-label">Name *</label>
-                            <input type="text" name="name" className="form-input" value={form.name} onChange={handleChange} required />
-                        </div>
-                        <div className="grid grid-2">
-                            <div className="form-group">
-                                <label className="form-label">Email</label>
-                                <input type="email" name="email" className="form-input" value={form.email} onChange={handleChange} />
+                        {activeTab === 'details' ? (
+                            <>
+                                <div className="form-group">
+                                    <label className="form-label">Name *</label>
+                                    <input type="text" name="name" className="form-input" value={form.name} onChange={handleChange} required />
+                                </div>
+                                <div className="grid grid-2">
+                                    <div className="form-group">
+                                        <label className="form-label">Email</label>
+                                        <input type="email" name="email" className="form-input" value={form.email} onChange={handleChange} />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Phone</label>
+                                        <input type="tel" name="phone" className="form-input" value={form.phone} onChange={handleChange} />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Company</label>
+                                    <input type="text" name="company" className="form-input" value={form.company} onChange={handleChange} />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Address</label>
+                                    <textarea name="address" className="form-input" value={form.address} onChange={handleChange} rows={2} />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Notes</label>
+                                    <textarea name="notes" className="form-input" value={form.notes} onChange={handleChange} rows={3} />
+                                </div>
+                            </>
+                        ) : (
+                            <div>
+                                <FileUpload
+                                    entityType="CLIENT"
+                                    entityId={client.id}
+                                    onUploadComplete={handleUploadComplete}
+                                />
+                                <div style={{ marginTop: '1.5rem' }}>
+                                    <h4 style={{ marginBottom: '1rem', fontSize: '0.875rem', fontWeight: '600', color: '#666' }}>
+                                        Attached Files
+                                    </h4>
+                                    {attachments.length === 0 ? (
+                                        <p style={{ textAlign: 'center', color: '#999', padding: '2rem' }}>No files attached</p>
+                                    ) : (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                            {attachments.map(file => (
+                                                <div key={file.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', backgroundColor: '#f9fafb', borderRadius: '4px' }}>
+                                                    <div style={{ flex: 1 }}>
+                                                        <div style={{ fontWeight: '500', fontSize: '0.875rem' }}>{file.originalName}</div>
+                                                        <div style={{ fontSize: '0.75rem', color: '#666' }}>
+                                                            {(file.size / 1024).toFixed(1)} KB • {new Date(file.createdAt).toLocaleDateString()}
+                                                        </div>
+                                                    </div>
+                                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                        <a
+                                                            href={`${import.meta.env.VITE_API_URL}/api/attachments/${file.id}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            style={{ padding: '0.25rem 0.75rem', backgroundColor: '#6366f1', color: 'white', borderRadius: '4px', textDecoration: 'none', fontSize: '0.875rem' }}
+                                                        >
+                                                            Download
+                                                        </a>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleDeleteAttachment(file.id)}
+                                                            style={{ padding: '0.25rem 0.75rem', backgroundColor: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.875rem' }}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                            <div className="form-group">
-                                <label className="form-label">Phone</label>
-                                <input type="tel" name="phone" className="form-input" value={form.phone} onChange={handleChange} />
-                            </div>
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Company</label>
-                            <input type="text" name="company" className="form-input" value={form.company} onChange={handleChange} />
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Address</label>
-                            <textarea name="address" className="form-input" value={form.address} onChange={handleChange} rows={2} />
-                        </div>
-                        <div className="form-group">
-                            <label className="form-label">Notes</label>
-                            <textarea name="notes" className="form-input" value={form.notes} onChange={handleChange} rows={3} />
-                        </div>
+                        )}
                     </div>
                     <div className="modal-footer">
                         <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
-                        <button type="submit" className="btn btn-primary">{client ? 'Update' : 'Create'}</button>
+                        {activeTab === 'details' && (
+                            <button type="submit" className="btn btn-primary">{client ? 'Update' : 'Create'}</button>
+                        )}
                     </div>
                 </form>
             </div>

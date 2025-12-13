@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
     FiHome, FiUsers, FiFileText, FiDollarSign, FiMail,
-    FiSettings, FiLogOut, FiLayers, FiBook, FiBarChart2, FiCheckSquare, FiCreditCard, FiClock, FiTrendingUp, FiTarget, FiBriefcase
+    FiSettings, FiLogOut, FiLayers, FiBook, FiBarChart2, FiCheckSquare, FiCreditCard, FiClock, FiTrendingUp, FiTarget, FiBriefcase, FiKey
 } from 'react-icons/fi';
 import './Layout.css';
 
@@ -30,6 +30,7 @@ export default function Layout({ children }) {
         { to: '/proposals', icon: FiBook, label: 'Proposals' },
         { to: '/templates', icon: FiLayers, label: 'Templates' },
         { to: '/messages', icon: FiMail, label: 'Messages' },
+        { to: '/api-keys', icon: FiKey, label: 'API Keys' },
         { to: '/settings', icon: FiSettings, label: 'Settings' }
     ];
 
