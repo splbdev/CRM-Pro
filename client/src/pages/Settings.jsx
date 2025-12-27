@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { providers } from '../api';
-import { FiPlus, FiEdit2, FiTrash2, FiCheck, FiEye, FiEyeOff } from 'react-icons/fi';
+import { useTheme } from '../context/ThemeContext';
+import { FiPlus, FiEdit2, FiTrash2, FiCheck, FiEye, FiEyeOff, FiMonitor, FiMessageSquare } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 const PROVIDER_TYPES = ['SMS', 'EMAIL', 'WHATSAPP'];
@@ -22,9 +23,12 @@ const PROVIDERS_BY_TYPE = {
 };
 
 export default function Settings() {
+    const { theme, setTheme, availableThemes } = useTheme();
     const [providerList, setProviderList] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('SMS');
+    // Tabs: 'appearance', 'communication'
+    const [mainTab, setMainTab] = useState('appearance');
+    const [providerTab, setProviderTab] = useState('SMS');
     const [showModal, setShowModal] = useState(false);
     const [editingProvider, setEditingProvider] = useState(null);
     const [viewCredentials, setViewCredentials] = useState(null);
@@ -89,100 +93,202 @@ export default function Settings() {
         }
     };
 
-    const filteredProviders = providerList.filter(p => p.type === activeTab);
+    const filteredProviders = providerList.filter(p => p.type === providerTab);
 
     return (
         <div className="page">
             <div className="page-header">
                 <div>
                     <h1 className="page-title">Settings</h1>
-                    <p className="page-subtitle">Configure your communication providers</p>
+                    <p className="page-subtitle">Configure application settings</p>
                 </div>
             </div>
 
-            <div className="card">
-                <div className="card-header">
-                    <div style={{ display: 'flex', gap: 8 }}>
-                        {PROVIDER_TYPES.map(t => (
-                            <button key={t} className={`btn ${activeTab === t ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setActiveTab(t)}>
-                                {t}
-                            </button>
-                        ))}
-                    </div>
-                    <button className="btn btn-primary" onClick={() => { setEditingProvider(null); setShowModal(true); }}>
-                        <FiPlus /> Add Provider
-                    </button>
-                </div>
+            <div className="btn-group" style={{ marginBottom: '2rem' }}>
+                <button
+                    className={`btn ${mainTab === 'appearance' ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={() => setMainTab('appearance')}
+                >
+                    <FiMonitor /> Appearance
+                </button>
+                <button
+                    className={`btn ${mainTab === 'communication' ? 'btn-primary' : 'btn-secondary'}`}
+                    onClick={() => setMainTab('communication')}
+                >
+                    <FiMessageSquare /> Communication
+                </button>
+            </div>
 
-                {loading ? (
-                    <div className="loading"><div className="spinner"></div></div>
-                ) : filteredProviders.length > 0 ? (
-                    <div className="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Provider</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
+            {mainTab === 'appearance' && (
+                <div className="card">
+                    <div className="card-header">
+                        <h3 className="card-title">Theme Selection</h3>
+                    </div>
+                    <div style={{ padding: '1.5rem' }}>
+                        <div className="grid grid-3">
+                            {Object.values(availableThemes).map(themeOption => (
+                                <button
+                                    key={themeOption.id}
+                                    onClick={() => setTheme(themeOption.id)}
+                                    style={{
+                                        position: 'relative',
+                                        border: theme === themeOption.id ? `2px solid var(--primary)` : '2px solid transparent',
+                                        borderRadius: '12px',
+                                        overflow: 'hidden',
+                                        textAlign: 'left',
+                                        cursor: 'pointer',
+                                        background: 'transparent',
+                                        padding: 0,
+                                        transition: 'all 0.2s'
+                                    }}
+                                >
+                                    {/* Theme Preview */}
+                                    <div style={{
+                                        height: '100px',
+                                        background: themeOption.colors['--bg-primary'],
+                                        position: 'relative',
+                                        borderBottom: `1px solid ${themeOption.colors['--border']}`
+                                    }}>
+                                        {/* Sidebar Preview */}
+                                        <div style={{
+                                            position: 'absolute',
+                                            left: 0, top: 0, bottom: 0, width: '25%',
+                                            background: themeOption.colors['--bg-card'],
+                                            borderRight: `1px solid ${themeOption.colors['--border']}`
+                                        }} />
+                                        {/* Card Preview */}
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: '20px', left: '35%', right: '10px', height: '40px',
+                                            background: themeOption.colors['--bg-card'],
+                                            borderRadius: '6px',
+                                            border: `1px solid ${themeOption.colors['--border']}`
+                                        }}>
+                                            <div style={{
+                                                width: '40%', height: '8px',
+                                                background: themeOption.colors['--text-secondary'],
+                                                opacity: 0.3, borderRadius: '4px', margin: '8px'
+                                            }} />
+                                        </div>
+                                        {/* Button Preview */}
+                                        <div style={{
+                                            position: 'absolute',
+                                            bottom: '10px', right: '10px',
+                                            background: themeOption.colors['--primary'],
+                                            width: '24px', height: '24px', borderRadius: '4px'
+                                        }} />
+                                    </div>
+                                    <div style={{
+                                        padding: '1rem',
+                                        background: 'var(--bg-card)',
+                                        display: 'flex',
+                                        justify- content: 'space-between',
+                                    alignItems: 'center'
+                                    }}>
+                                    <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{themeOption.name}</span>
+                                    {theme === themeOption.id && (
+                                        <FiCheck style={{ color: 'var(--primary)' }} />
+                                    )}
+                                </div>
+                                </button>
+                            ))}
+                    </div>
+                </div>
+                </div>
+    )
+}
+
+{
+    mainTab === 'communication' && (
+        <div className="card">
+            <div className="card-header">
+                <div style={{ display: 'flex', gap: 8 }}>
+                    {PROVIDER_TYPES.map(t => (
+                        <button key={t} className={`btn ${providerTab === t ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setProviderTab(t)}>
+                            {t}
+                        </button>
+                    ))}
+                </div>
+                <button className="btn btn-primary" onClick={() => { setEditingProvider(null); setShowModal(true); }}>
+                    <FiPlus /> Add Provider
+                </button>
+            </div>
+
+            {loading ? (
+                <div className="loading"><div className="spinner"></div></div>
+            ) : filteredProviders.length > 0 ? (
+                <div className="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Provider</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredProviders.map(p => (
+                                <tr key={p.id}>
+                                    <td><strong>{p.name || p.provider}</strong></td>
+                                    <td>{p.provider}</td>
+                                    <td>
+                                        <span className={`badge badge-${p.isActive ? 'success' : 'default'}`}>
+                                            {p.isActive ? 'Active' : 'Inactive'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div style={{ display: 'flex', gap: 6 }}>
+                                            {!p.isActive && (
+                                                <button className="btn btn-sm btn-success" onClick={() => handleActivate(p.id)} title="Activate">
+                                                    <FiCheck />
+                                                </button>
+                                            )}
+                                            <button className="btn btn-sm btn-secondary" onClick={() => handleViewCredentials(p.id)} title="View Credentials">
+                                                <FiEye />
+                                            </button>
+                                            <button className="btn btn-sm btn-secondary" onClick={() => { setEditingProvider(p); setShowModal(true); }}>
+                                                <FiEdit2 />
+                                            </button>
+                                            <button className="btn btn-sm btn-danger" onClick={() => handleDelete(p.id)}>
+                                                <FiTrash2 />
+                                            </button>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {filteredProviders.map(p => (
-                                    <tr key={p.id}>
-                                        <td><strong>{p.name || p.provider}</strong></td>
-                                        <td>{p.provider}</td>
-                                        <td>
-                                            <span className={`badge badge-${p.isActive ? 'success' : 'default'}`}>
-                                                {p.isActive ? 'Active' : 'Inactive'}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div style={{ display: 'flex', gap: 6 }}>
-                                                {!p.isActive && (
-                                                    <button className="btn btn-sm btn-success" onClick={() => handleActivate(p.id)} title="Activate">
-                                                        <FiCheck />
-                                                    </button>
-                                                )}
-                                                <button className="btn btn-sm btn-secondary" onClick={() => handleViewCredentials(p.id)} title="View Credentials">
-                                                    <FiEye />
-                                                </button>
-                                                <button className="btn btn-sm btn-secondary" onClick={() => { setEditingProvider(p); setShowModal(true); }}>
-                                                    <FiEdit2 />
-                                                </button>
-                                                <button className="btn btn-sm btn-danger" onClick={() => handleDelete(p.id)}>
-                                                    <FiTrash2 />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                ) : (
-                    <div className="empty-state">
-                        <p>No {activeTab} providers configured</p>
-                    </div>
-                )}
-            </div>
-
-            {showModal && (
-                <ProviderModal
-                    provider={editingProvider}
-                    type={activeTab}
-                    onClose={() => { setShowModal(false); setEditingProvider(null); }}
-                    onSubmit={handleSubmit}
-                />
-            )}
-
-            {viewCredentials && (
-                <CredentialsModal
-                    provider={viewCredentials}
-                    onClose={() => setViewCredentials(null)}
-                />
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            ) : (
+                <div className="empty-state">
+                    <p>No {providerTab} providers configured</p>
+                </div>
             )}
         </div>
+    )
+}
+
+{
+    showModal && (
+        <ProviderModal
+            provider={editingProvider}
+            type={providerTab}
+            onClose={() => { setShowModal(false); setEditingProvider(null); }}
+            onSubmit={handleSubmit}
+        />
+    )
+}
+
+{
+    viewCredentials && (
+        <CredentialsModal
+            provider={viewCredentials}
+            onClose={() => setViewCredentials(null)}
+        />
+    )
+}
+        </div >
     );
 }
 
